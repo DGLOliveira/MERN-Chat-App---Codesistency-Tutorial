@@ -13,6 +13,8 @@ app.get("/", (req, res) => {
     res.send("Hello from backend");
 })
 
+app.use(express.json());
+
 app.use("/api/auth", authRoutes)
 
 app.listen(PORT, () => {
