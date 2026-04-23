@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
-
+import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
     try {
@@ -85,5 +85,45 @@ export const logout = (req, res) => {
     } catch (error) {
         res.status(500).send("Internal server error");
         console.log("Error in logout controller: " + error);
+    }
+}
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { fullname, profileImage } = req.body;
+        if (!fullname) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(400).json({ error: "User not found" });
+        }
+        if(!fullname && !profileImage){ 
+            return res.status(400).json({ error: "No fields to update" });
+        }
+        if(fullname){ 
+            user.fullname = fullname;
+        }
+        if(profileImage){ 
+            if(user.profileImage){
+                await cloudinary.uploader.destroy(user.profileImage);
+            }
+            const result = await cloudinary.uploader.upload(profileImage);
+            user.profileImage = result.secure_url;
+        }
+        const updatedUser = await user.save();
+        res.status(200).json({ message: "User profile updated successfully", user: updatedUser });
+    } catch (error) {
+        res.status(500).send("Internal server error");
+        console.log("Error in updateProfile controller: " + error);
+    }
+}
+
+export const checkAuth = (req, res) => {
+    try {
+        res.status(200).json({ message: "User is authenticated", user: req.user });
+    } catch (error) {
+        res.status(500).send("Internal server error");
+        console.log("Error in checkAuth controller: " + error);
     }
 }
