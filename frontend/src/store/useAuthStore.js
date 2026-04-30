@@ -23,10 +23,29 @@ export const useAuthStore = create((set) => ({
         }
     },
 
-    signup: async (email, password, fullname) => {
+    validateForm: (data) => {
+        if(!data.email.trim()){
+            return toast.error("Email is required");
+        }
+        if(!/\S+@\S+\.\S+/.test(data.email)){
+            return toast.error("Invalid email format");
+        }
+        if(!data.password){
+            return toast.error("Password is required");
+        }
+        if(data.password.length < 8){
+            return toast.error("Password must be at least 8 characters")
+        };
+        if(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(data.password)){
+            return toast.error("Password must contain at least one number, one lowercase letter, one uppercase letter and one special character")
+        }
+        return true
+    },
+
+    signup: async (data) => {
         try {
             set({ isSigningUp: true });
-            const res = await axiosInstance.post("/auth/signup", { email, password, fullname});
+            const res = await axiosInstance.post("/auth/signup", data);
             set({ authUser: res.data });
         } catch (error) {
             toast.error(error.res.data.message);
@@ -35,6 +54,30 @@ export const useAuthStore = create((set) => ({
         } finally {
             toast.success("Account created successfully");
             set({ isSigningUp: false });
+        }
+    },
+
+    login: async (data) => {
+        try {
+            set({ isLoggingIn: true });
+            const res = await axiosInstance.post("/auth/login", data);
+            set({ authUser: res.data });
+        } catch (error) {
+            toast.error(error.res.data.message);
+            set({ isLoggingIn: false });
+            console.log("Error in login: " + error);
+        } finally {
+            set({ isLoggingIn: false });
+        }
+    },
+
+    logout: async () => {
+        try {
+            await axiosInstance.get("/auth/logout");
+            set({ authUser: null });
+        } catch (error) {
+            toast.error(error.res.data.message);
+            console.log("Error in logout: " + error);
         }
     },
 }))

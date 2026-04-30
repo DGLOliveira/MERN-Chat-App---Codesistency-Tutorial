@@ -12,41 +12,21 @@ const Register = () => {
     fullname: ''
   })
 
-  const { signup, isSigningUp } = useAuthStore()
-
-  const validadeForm = () => {
-    if (!formData.fullName.trim()){ 
-      return toast.error("Full name is required");
-    }
-    if (!formData.email.trim()){ 
-      return toast.error("Email is required");
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)){ 
-      return toast.error("Invalid email format");
-    }
-    if (!formData.password){ 
-      return toast.error("Password is required");
-    }
-    if (formData.password.length < 8){ 
-      return toast.error("Password must be at least 8 characters")
-    };
-    if(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)){
-      return toast.error("Password must contain at least one number, one lowercase letter, one uppercase letter and one special character")
-    }
-    return true
-  }
+  const { signup, isSigningUp, validateForm } = useAuthStore()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const success = validadeForm()
+    if(formData.fullName.trim().length < 3) 
+      return toast.error("Full name must be at least 3 characters");
+    const success = validadeForm(formData)
     if (success === true){
       signup(formData.email, formData.password, formData.fullname)
     } 
   }
 
   return (
-    <div  className="min-h-screen grid lg:grid-cols-2 justify-center items-center p-6 sm:p-12">
-      <h1 className="text-2xl font-bold mt-2 text-center">Register</h1>
+    <div  className="min-h-screen flex flex-col justify-center items-center p-6 sm:p-12">
+      <h1 className="text-2xl font-bold mt-2 text-center p-4">Register</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="form-control">
@@ -125,11 +105,11 @@ const Register = () => {
           )}
         </button>
       </form>
-      <div className="text-center">
+      <div className="text-center p-4">
         <p className="text-base-content/60">
           Already have an account?{" "}
           <Link to="/login" className="link link-primary">
-            Sign in
+            Log in
           </Link>
         </p>
       </div>
