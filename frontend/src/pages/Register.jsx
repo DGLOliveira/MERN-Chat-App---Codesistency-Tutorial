@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { User, Eye, EyeOff, Loader2, Mail, Lock } from 'lucide-react'
 import { Link } from 'react-router'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -12,20 +12,45 @@ const Register = () => {
     fullname: ''
   })
 
-  const { signup, isSigningUp, validateForm } = useAuthStore()
+  const { signup, isSigningUp } = useAuthStore()
+
+
+  const validateForm = (data) => {
+    if(!data.fullName) {
+       return toast.error("Full name is required");
+      }
+    if (data.fullName.trim().length < 3 ){
+      return toast.error("Full name must be at least 3 characters");
+    }
+    if (!data.email.trim() || !data.email) {
+      return toast.error("Email is required");
+    }
+    if (!/\S+@\S+\.\S+/.test(data.email)) {
+      return toast.error("Invalid email format");
+    }
+    if (!data.password) {
+      return toast.error("Password is required");
+    }
+    if (data.password.length < 8) {
+      return toast.error("Password must be at least 8 characters");
+    };
+    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(data.password)) {
+      return toast.error("Password must contain at least one number, one lowercase letter, one uppercase letter and one special character");
+    }
+    return true
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if(formData.fullName.trim().length < 3) 
-      return toast.error("Full name must be at least 3 characters");
-    const success = validadeForm(formData)
-    if (success === true){
-      signup(formData.email, formData.password, formData.fullname)
-    } 
+    const success = validateForm(formData)
+    console.log(success)
+    if (success === true) {
+      signup(formData)
+    }
   }
 
   return (
-    <div  className="min-h-screen flex flex-col justify-center items-center p-6 sm:p-12">
+    <div className="min-h-screen flex flex-col justify-center items-center p-6 sm:p-12">
       <h1 className="text-2xl font-bold mt-2 text-center p-4">Register</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">

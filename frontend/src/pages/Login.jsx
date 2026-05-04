@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { Eye, EyeOff, Loader2, Mail, Lock } from 'lucide-react'
 import { Link } from 'react-router'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -15,10 +15,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const success = validateForm(formData)
-    if (success === true) {
-      login(formData.email, formData.password)
-    }
+    login(formData)
   }
 
   return (
