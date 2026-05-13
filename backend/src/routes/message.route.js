@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get("/users", protectRoute, getUsers)
 
-router.post("/send", protectRoute, sendMessage)
+router.post("/send/:id", protectRoute, sendMessage)
 
 router.get("/:id", protectRoute, getMessages)
 

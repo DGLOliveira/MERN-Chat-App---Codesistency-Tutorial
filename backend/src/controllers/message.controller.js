@@ -33,15 +33,23 @@ export const getMessages = async (req, res) => {
 export const sendMessage = async (req, res) => {
     try {
         const image = req.body.image;
+        let text = req.body.text;
+        let imgResult;
         if(image){
-            const result = await cloudinary.uploader.upload(picture);
-            image = result.secure_url;
+            const result = await cloudinary.uploader.upload(image);
+            imgResult = result.secure_url;
         }
+        if(image && !text){ 
+            text = " "; // set text to single space if image is provided, to avoid empty message error
+        };
+        if(!image && !text){ 
+            res.status(400).send("No text or image provided");
+        };
         const message = await Message.create({
-            sender: req.user._id,
-            receiver: req.params.id,
-            message: req.body.message,
-            image: image ? image : ""
+            senderId: req.user._id,
+            receiverId: req.params.id,
+            message: text,
+            image: imgResult ? imgResult : ""
         });
         
         res.status(201).json(message);
