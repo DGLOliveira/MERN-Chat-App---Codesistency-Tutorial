@@ -16,10 +16,10 @@ const Register = () => {
 
 
   const validateForm = (data) => {
-    if(!data.fullName) {
+    if(!data.fullname) {
        return toast.error("Full name is required");
       }
-    if (data.fullName.trim().length < 3 ){
+    if (data.fullname.trim().length < 3 ){
       return toast.error("Full name must be at least 3 characters");
     }
     if (!data.email.trim() || !data.email) {
@@ -34,7 +34,7 @@ const Register = () => {
     if (data.password.length < 8) {
       return toast.error("Password must be at least 8 characters");
     };
-    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(data.password)) {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/g.test(data.password)) {
       return toast.error("Password must contain at least one number, one lowercase letter, one uppercase letter and one special character");
     }
     return true
@@ -43,7 +43,6 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const success = validateForm(formData)
-    console.log(success)
     if (success === true) {
       signup(formData)
     }
@@ -66,8 +65,8 @@ const Register = () => {
               type="text"
               className={`input input-bordered w-full pl-10`}
               placeholder="John Doe"
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              value={formData.fullname}
+              onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
             />
           </div>
         </div>
