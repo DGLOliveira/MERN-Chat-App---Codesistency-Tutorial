@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsers = async (req, res) => {
     try {
@@ -34,10 +35,10 @@ export const sendMessage = async (req, res) => {
     try {
         const image = req.body.image;
         let imgResult;
-        if(!image && !req.body.text){ 
+        if (!image && !req.body.text) {
             res.status(400).send("No text or image provided");
         };
-        if(image){
+        if (image) {
             const result = await cloudinary.uploader.upload(image);
             imgResult = result.secure_url;
         }
@@ -47,6 +48,10 @@ export const sendMessage = async (req, res) => {
             message: req.body.text,
             image: imgResult ? imgResult : ""
         });
+        const receiverSocketId = getReceiverSocketId(req.params.id);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", message);
+        }
         res.status(201).json(message);
     } catch (error) {
         res.status(500).send("Internal server error");
